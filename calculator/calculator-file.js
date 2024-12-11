@@ -75,15 +75,43 @@ buttons.forEach((button) => {
  * It requires: 1) An array for the tokens. 2) A queue for the output (shows in RPN). 3) A stack for the operations.
  */
 function performOperation(display) {
-    //takes a string from the display, turns it into a math equation
-    let mathArray = display.split(''), total = 0;
-    //going to try with reverse polish notation
-    //the algorithm is as above
-    for (let index = 0; index < mathArray.length; index++) {
-        if (mathArray[index] == '/') {
-            mathArray[index] = mathArray[index - 1]/mathArray[index + 1]
+    let infixNotation = display.split('');
+    let operatorStack = new Stack();
+    let outputQueue = new Queue();
+    let operators = "+-/*";
+
+    for (let index = 0; index < infixNotation.length; index++) {
+        if (typeof infixNotation[index] == "number") {
+            outputQueue.enqueue(infixNotation[index]);
+        } else if (operators.includes(infixNotation[index])) {
+            //while there's an operator on the top of the stack with greater precedence:
+                //pop operators from the stack onto the output queue
+
+            if (precedence(operatorStack.peek()) > precendence(infixNotation[index])) {
+                for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
+                    outputQueue.enqueue(operatorStack.pop()); // i think this pops all...
+                }
+            }
+            operatorStack.push(infixNotation[index]);
+        } else if (infixNotation[index] === '(') {
+            operatorStack.push(infixNotation[index]);
+        } else if (infixNotation[index] === ')') {
+            for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
+                if (operatorStack.peek() !== '(') {
+                    outputQueue.enqueue(operatorStack.pop()); // i think this pops all...
+                } else {
+                    operatorStack.pop();
+                }
+            }
         }
     }
+
+    //below codes checks if there are any more items in the operatorStack and queues them...
+    for (let counter = operatorStack.length -1; counter >= 0; counter--) {
+        outputQueue.enqueue(operatorStack.pop());
+    }
+
+    //after all this, the outputQueue is in RPN. 
 }
 
 class Stack {
@@ -120,6 +148,55 @@ class Stack {
     size() {
         return this.items.length;
     }
+
+    clear() {
+        this.items = [];
+    }
+}
+
+class Queue {
+    constructor() {
+        this.items = [];
+    }
+
+    enqueue(element) {
+        this.items.push(element);
+    }
+
+    dequeue() {
+        return this.items.shift(); //removes and returns element from beginning of array
+    }
+
+    isEmpty() {
+        return this.items.length === 0;
+    }
+
+    peek() {
+        if (!this.isEmpty()) {
+            return this.items[0];
+        }
+        return null;
+    }
+
+    size() {
+        return this.items.length;
+    }
+
+    print() {
+        console.log(this.items.toString());
+    }
+}
+
+function precedence(operator) {
+    if (operator === "/") {
+        return 3;
+    } else if (operator === "*") {
+        return 2;
+    } else if (operator === "+") {
+        return 1;
+    } else if (operator === "-") {
+        return 0;
+  }
 }
 
 function printDisplay() {

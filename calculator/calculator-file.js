@@ -93,6 +93,30 @@ function performOperation(display) {
     //console.log(outputQueue);
     let operators = "+-/*";
 
+    //need to loop through infix notation and conjoin any numbers that are like: 12, 13, 20, 40. i.e. two, three digit numbers
+    //so that when we go to operate on them it doesn't fk up.
+
+    for (let counter = 0; counter < infixNotation.length; counter++) {
+        if (isNumber(infixNotation[counter])) {
+            let subarrayCounter = counter;
+            let subarray = [infixNotation[counter]];
+            while (isNumber(infixNotation[subarrayCounter + 1])) {
+                subarray.push(infixNotation[subarrayCounter + 1]);
+                subarrayCounter++;
+            }
+            
+            if (subarrayCounter == counter) {
+                continue;
+            } else {
+                //NEED TO JOIN ALL THE SUBARRAY ITEMS
+                for (let subarrayIndex = 1; subarrayIndex < subarray.length; subarrayIndex++) {
+                    subarray[0] = subarray[0] + subarray[subarrayIndex];
+                }
+                infixNotation.splice(counter, subarray.length, subarray[0]); //DON'T THINK THIS IS WORKING
+            }
+        }
+    }
+
     //Below's code loops through infixNotation and add the items to the operator stack or output queue
     for (let index = 0; index < infixNotation.length; index++) { 
         if (isNumber(infixNotation[index])) { //is the infixNotation a number? NEED TO MAKE IT SO IT TAKES TWO, THREE, etc. digit number (for loop)

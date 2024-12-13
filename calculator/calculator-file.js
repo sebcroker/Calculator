@@ -16,14 +16,14 @@ buttons.forEach((button) => {
             if (display == '') {
                 //do nothing
             } else {
-                display += '+';
+                display += '*';
                 printDisplay();
             }
         } else if (button.id == 'subtraction') {
             if (display == '') {
                 //do nothing
             } else {
-                display += '+';
+                display += '-';
                 printDisplay();
             }
         } else if (button.id == 'division') {
@@ -49,24 +49,34 @@ buttons.forEach((button) => {
             }
         } else if (button.id == 'one') {
             display += '1';
+            printDisplay();
         } else if (button.id == 'two') {
-            display += '2'
+            display += '2';
+            printDisplay();
         } else if (button.id == 'three') {
-            display += '3'
+            display += '3';
+            printDisplay();
         } else if (button.id == 'four') {
-            display += '4'
+            display += '4';
+            printDisplay();
         } else if (button.id == 'five') {
-            display += '5'
+            display += '5';
+            printDisplay();
         } else if (button.id == 'six') {
-            display += '6'
+            display += '6';
+            printDisplay();
         } else if (button.id == 'seven') {
-            display += '7'
+            display += '7';
+            printDisplay();
         } else if (button.id == 'eight') {
-            display += '8'
+            display += '8';
+            printDisplay();
         } else if (button.id == 'nine') {
-            display += '9'
+            display += '9';
+            printDisplay();
         } else if (button.id == 'zero') {
-            display += '0'
+            display += '0';
+            printDisplay();
         }
     })
 })
@@ -77,19 +87,20 @@ buttons.forEach((button) => {
 function performOperation(display) {
     let infixNotation = display.split('');
     let operatorStack = new Stack();
-    let outputQueue = new Queue();
+    let outputQueue = [];
     let operators = "+-/*";
 
-    for (let index = 0; index < infixNotation.length; index++) {
-        if (typeof infixNotation[index] == "number") {
-            outputQueue.enqueue(infixNotation[index]);
-        } else if (operators.includes(infixNotation[index])) {
+    //Below's code loops through infixNotation and add the items to the operator stack or output queue
+    for (let index = 0; index < infixNotation.length; index++) { 
+        if (isNumber(infixNotation[index])) { //is the infixNotation a number? NEED TO MAKE IT SO IT TAKES TWO, THREE, etc. digit number (for loop)
+            outputQueue.push(infixNotation[index]);
+        } else if (operators.includes(infixNotation[index])) { //is the infixNotation an operator?
             //while there's an operator on the top of the stack with greater precedence:
                 //pop operators from the stack onto the output queue
 
             if (precedence(operatorStack.peek()) > precendence(infixNotation[index])) {
                 for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
-                    outputQueue.enqueue(operatorStack.pop()); // i think this pops all...
+                    outputQueue.push(operatorStack.pop()); // i think this pops all... NEED TO CHECK IF THIS ACTUALLY WORKS.
                 }
             }
             operatorStack.push(infixNotation[index]);
@@ -98,7 +109,7 @@ function performOperation(display) {
         } else if (infixNotation[index] === ')') {
             for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
                 if (operatorStack.peek() !== '(') {
-                    outputQueue.enqueue(operatorStack.pop()); // i think this pops all...
+                    outputQueue.push(operatorStack.pop()); // i think this pops all...
                 } else {
                     operatorStack.pop();
                 }
@@ -106,12 +117,30 @@ function performOperation(display) {
         }
     }
 
-    //below codes checks if there are any more items in the operatorStack and queues them...
+    //below's code checks if there are any more items in the operatorStack and queues them...
     for (let counter = operatorStack.length -1; counter >= 0; counter--) {
-        outputQueue.enqueue(operatorStack.pop());
+        outputQueue.push(operatorStack.pop());
     }
 
-    //after all this, the outputQueue is in RPN. 
+    //after all this, the outputQueue is in RPN.
+    //get the first operator as you move up the queue
+    //then, use that operator on the two numbers in the queue before that operator
+    //as you do so, shift everything down two places
+    //For this reason, as I lack the true understanding of queues I'm going to use an array for the output queue and slice/splice etc.
+
+    for (let counter = 0; counter < outputQueue.length; counter++) {
+        if (operators.includes(outputQueue[counter])) {
+            if (outputQueue[counter] === '/') {
+                outputQueue[counter - 2] / outputQueue[counter - 1];
+            } else if (outputQueue[counter] === '*') {
+                outputQueue[counter - 2] * outputQueue[counter - 1];
+            } else if (outputQueue[counter] === '+') {
+                outputQueue[counter - 2] + outputQueue[counter - 1];
+            } else if (outputQueue[counter] === '-') {
+                outputQueue[counter - 2] - outputQueue[counter - 1];
+            }
+        }
+    }
 }
 
 class Stack {
@@ -154,7 +183,7 @@ class Stack {
     }
 }
 
-class Queue {
+/**class Queue {
     constructor() {
         this.items = [];
     }
@@ -185,7 +214,7 @@ class Queue {
     print() {
         console.log(this.items.toString());
     }
-}
+}*/
 
 function precedence(operator) {
     if (operator === "/") {
@@ -197,6 +226,32 @@ function precedence(operator) {
     } else if (operator === "-") {
         return 0;
   }
+}
+
+function isNumber(value) {
+    if (value == "1") {
+        return true;
+    } else if ( value == "2") {
+        return true;
+    } else if (value == "3") {
+        return true;
+    } else if (value == "4") {
+        return true;
+    } else if (value == "5") {
+        return true;
+    } else if (value == "6") {
+        return true;
+    } else if (value == "7") {
+        return true;
+    } else if (value == "8") {
+        return true;
+    } else if (value == "9") {
+        return true;
+    } else if (value == "0") {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function printDisplay() {

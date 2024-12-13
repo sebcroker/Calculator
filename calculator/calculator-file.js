@@ -2,7 +2,7 @@ let display = '', mathEqn = null;
 const buttons = document.querySelectorAll('button');
 const displayPane = document.querySelector('.display');
 const outputPane =  document.querySelector('.output');
-clearCalculator();
+//clearCalculator();
 
 buttons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -39,7 +39,6 @@ buttons.forEach((button) => {
                 //do nothing
             } else {
                 performOperation(display);
-                clearDisplay();
             }
         } else if (button.id == 'clear') {
             if (display == '') {
@@ -87,29 +86,35 @@ buttons.forEach((button) => {
  */
 function performOperation(display) {
     let infixNotation = display.split('');
-    let operatorStack = new Stack();
+    //console.log(infixNotation);
+    let operatorStack = [];
+    //console.log(operatorStack);
     let outputQueue = [];
+    //console.log(outputQueue);
     let operators = "+-/*";
 
     //Below's code loops through infixNotation and add the items to the operator stack or output queue
     for (let index = 0; index < infixNotation.length; index++) { 
         if (isNumber(infixNotation[index])) { //is the infixNotation a number? NEED TO MAKE IT SO IT TAKES TWO, THREE, etc. digit number (for loop)
+            //console.log("I'm in");
             outputQueue.push(infixNotation[index]);
+            console.log(outputQueue);
         } else if (operators.includes(infixNotation[index])) { //is the infixNotation an operator?
             //while there's an operator on the top of the stack with greater precedence:
                 //pop operators from the stack onto the output queue
-
-            if (precedence(operatorStack.peek()) > precedence(infixNotation[index])) {
+            console.log(infixNotation[index]);
+            if (precedence(operatorStack[operatorStack.length - 1]) > precedence(infixNotation[index])) {
                 for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
                     outputQueue.push(operatorStack.pop()); // i think this pops all... NEED TO CHECK IF THIS ACTUALLY WORKS.
                 }
             }
             operatorStack.push(infixNotation[index]);
+            console.log(operatorStack);
         } else if (infixNotation[index] === '(') {
             operatorStack.push(infixNotation[index]);
         } else if (infixNotation[index] === ')') {
             for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
-                if (operatorStack.peek() !== '(') {
+                if (operatorStack[operatorStack.length - 1] !== '(') {
                     outputQueue.push(operatorStack.pop()); // i think this pops all...
                 } else {
                     operatorStack.pop();
@@ -122,6 +127,9 @@ function performOperation(display) {
     for (let counter = operatorStack.length -1; counter >= 0; counter--) {
         outputQueue.push(operatorStack.pop());
     }
+
+    console.log(operatorStack);
+    console.log(outputQueue);
 
     //after all this, the outputQueue is in RPN.
     //get the first operator as you move up the queue
@@ -164,7 +172,7 @@ function performOperation(display) {
     outputPane.textContent += outputQueue[0];
 }
 
-class Stack {
+/*class Stack {
     //Count is
     constructor() {
         this.items = [];
@@ -202,7 +210,7 @@ class Stack {
     clear() {
         this.items = [];
     }
-}
+}*/
 
 /**class Queue {
     constructor() {
@@ -273,6 +281,11 @@ function isNumber(value) {
     } else {
         return false;
     }
+}
+
+function clearDisplay() {
+    display.textContent = "";
+    printDisplay();
 }
 
 function printDisplay() {

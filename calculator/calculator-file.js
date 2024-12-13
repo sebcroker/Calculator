@@ -1,6 +1,7 @@
 let display = '', mathEqn = null;
 const buttons = document.querySelectorAll('button');
 const displayPane = document.querySelector('.display');
+const outputPane =  document.querySelector('.output');
 clearCalculator();
 
 buttons.forEach((button) => {
@@ -98,7 +99,7 @@ function performOperation(display) {
             //while there's an operator on the top of the stack with greater precedence:
                 //pop operators from the stack onto the output queue
 
-            if (precedence(operatorStack.peek()) > precendence(infixNotation[index])) {
+            if (precedence(operatorStack.peek()) > precedence(infixNotation[index])) {
                 for (let counter = operatorStack.length - 1; counter >= 0; counter--) {
                     outputQueue.push(operatorStack.pop()); // i think this pops all... NEED TO CHECK IF THIS ACTUALLY WORKS.
                 }
@@ -128,19 +129,39 @@ function performOperation(display) {
     //as you do so, shift everything down two places
     //For this reason, as I lack the true understanding of queues I'm going to use an array for the output queue and slice/splice etc.
 
+    /**Go up the array from 0, then check when you first encounter an operator.
+     * Once you encounter an operator, use that operator on the two numbers before it.
+     * To the LEFT of the operator will be the number two before that operator.
+     * To the RIGHT of the operator will be the number one before that operator.*/
+
+    /**After the operation has been evaluated, a number is produced, (tautological, but you get me).
+     * The number that is evaluated will now take the space at the array index TWO below the operator.
+     * The operator and numbers will taken out of the array and every item above it will be shifted down.
+     * .splice() is very useful here! It is the swiss army knife of the array methods.
+     * It takes a number of argsuments as it's parameters.
+     * The first of which is where you want the array to start removing elements, the second is how many elements you want it to remove.
+     * The REMAINDER OF THE ARGUMENT'S IT TAKES IS THE STUFF YOU WANT TO INPUT INTO THE ARRAY IN PLACE OF THOSE REMOVED ELEMENTS
+     * Note: you can also remove "0" elements to add items at the specified index.
+     */
     for (let counter = 0; counter < outputQueue.length; counter++) {
-        if (operators.includes(outputQueue[counter])) {
-            if (outputQueue[counter] === '/') {
-                outputQueue[counter - 2] / outputQueue[counter - 1];
-            } else if (outputQueue[counter] === '*') {
-                outputQueue[counter - 2] * outputQueue[counter - 1];
-            } else if (outputQueue[counter] === '+') {
-                outputQueue[counter - 2] + outputQueue[counter - 1];
-            } else if (outputQueue[counter] === '-') {
-                outputQueue[counter - 2] - outputQueue[counter - 1];
+        if (operators.includes(outputQueue[counter])) { //checks if it's an operator
+            if (outputQueue[counter] == '/') {
+                let computed = Number(outputQueue[counter - 2]) / Number(outputQueue[counter - 1]);
+                outputQueue.splice(counter - 2, 3, computed.toString()); //if everything in our array is a string(), keep it the same. Makes me feel safe.
+            } else if (outputQueue[counter] == '*') {
+                let computed = Number(outputQueue[counter - 2]) * Number(outputQueue[counter - 1]);
+                outputQueue.splice(counter - 2, 3, computed.toString());
+            } else if (outputQueue[counter] == '+') {
+                let computed = Number(outputQueue[counter - 2]) + Number(outputQueue[counter - 1]);
+                outputQueue.splice(counter - 2, 3, computed.toString());
+            } else if (outputQueue[counter] == '-') {
+                let computed = Number(outputQueue[counter - 2]) - Number(outputQueue[counter - 1]);
+                outputQueue.splice(counter - 2, 3, computed.toString());
             }
+            counter = 0; //reset the trace through the array
         }
-    }
+    } //after this loop, there are no more operations to do, but just an array is left with one number in it. round it to 1 decimal place please.
+    outputPane.textContent += outputQueue[0];
 }
 
 class Stack {
@@ -262,6 +283,7 @@ function clearCalculator() {
     displayPane.textContent = '';
     display = '';
 }
+
 function addition(a, b) { // ...args changes all the inputs into an array of elements
     return a + b;
 }

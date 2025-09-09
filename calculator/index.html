@@ -1,76 +1,266 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
     <title>Calculator Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-align: right;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .output {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            font-size: 1.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Operator buttons with special styling */
+        .operators button {
+            background: rgba(255, 107, 107, 0.3);
+            color: white;
+        }
+
+        .operators button:hover {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        #equals {
+            background: rgba(72, 187, 120, 0.4) !important;
+            grid-column: span 2;
+        }
+
+        #equals:hover {
+            background: rgba(72, 187, 120, 0.6) !important;
+        }
+
+        #clear {
+            background: rgba(239, 68, 68, 0.4) !important;
+            grid-column: span 2;
+        }
+
+        #clear:hover {
+            background: rgba(239, 68, 68, 0.6) !important;
+        }
+
+        #zero {
+            grid-column: span 2;
+        }
+
+        /* Hide images and use text instead for better styling */
+        button img {
+            display: none;
+        }
+
+        /* Add symbols as text content */
+        #addition::after { content: '+'; }
+        #subtraction::after { content: '−'; }
+        #multiplication::after { content: '×'; }
+        #division::after { content: '÷'; }
+        #equals::after { content: '='; }
+        #clear::after { content: 'AC'; font-size: 1.2em; }
+
+        #one::after { content: '1'; }
+        #two::after { content: '2'; }
+        #three::after { content: '3'; }
+        #four::after { content: '4'; }
+        #five::after { content: '5'; }
+        #six::after { content: '6'; }
+        #seven::after { content: '7'; }
+        #eight::after { content: '8'; }
+        #nine::after { content: '9'; }
+        #zero::after { content: '0'; }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .calculator-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .display {
+                font-size: 2em;
+                padding: 20px;
+            }
+
+            button {
+                padding: 15px;
+                font-size: 1.5em;
+                min-height: 60px;
+            }
+
+            .button-grid, .numbers-grid {
+                gap: 10px;
+            }
+        }
+
+        /* Optional: If you want to keep using images, uncomment this and comment out the ::after content */
+        /*
+        button img {
+            display: block;
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        button::after {
+            display: none;
+        }
+        */
+    </style>
 </head>
 
 <body>
-    <h1 class = 'display'>
+    <div class="calculator-container">
+        <h1 class="display">0</h1>
 
-    </h1>
+        <div class="output">
+            <h3>Your total is: 0</h3>
+        </div>
 
-    <div class = 'output'>
-        <h3>Your total is: </h3>
+        <div class="operators button-grid">
+            <button id="addition">
+                <img src="./images/Plus_sign.png" alt="Black Plus Sign">
+            </button>
+            <button id="subtraction">
+                <img src="./images/Minus_sign.png" alt="Black Minus Sign">
+            </button>
+            <button id="multiplication">
+                <img src="./images/Multiply_sign.png" alt="Black Multiply Sign">
+            </button>
+            <button id="division">
+                <img src="./images/Divide_sign.png" alt="Black Divide Sign">
+            </button>
+            <button id="clear">
+                <img src="./images/All_clear.png" alt="All Clear Sign">
+            </button>
+            <button id="equals">
+                <img src="./images/Equals_sign.png" alt="Black Equals Sign">
+            </button>
+        </div>
+
+        <div class="numbers numbers-grid">
+            <button id="one">
+                <img src="./images/one_digit.png" alt="One Digit">
+            </button>
+            <button id="two">
+                <img src="./images/two_digit.jpeg" alt="Two digit">
+            </button>
+            <button id="three">
+                <img src="./images/three_digit.png" alt="Three digit">
+            </button>
+            <button id="four">
+                <img src="./images/four_digit.png" alt="Four digit">
+            </button>
+            <button id="five">
+                <img src="./images/five_digit.png" alt="Five digit">
+            </button>
+            <button id="six">
+                <img src="./images/six_digit.png" alt="Six digit">
+            </button>
+            <button id="seven">
+                <img src="./images/seven_digit.jpeg" alt="Seven digit">
+            </button>
+            <button id="eight">
+                <img src="./images/eight_digit.png" alt="Eight digit">
+            </button>
+            <button id="nine">
+                <img src="./images/nine_digit.png" alt="Nine digit">
+            </button>
+            <button id="zero">
+                <img src="./images/zero_digit.jpeg" alt="Zero digit">
+            </button>
+        </div>
     </div>
-
-    <div class = 'operators'>
-        <button id = "addition">
-            <img src="./images/Plus_sign.png" alt="Black Plus Sign" height = 200px width = 200px>
-        </button>
-        <button id = "subtraction">
-            <img src="./images/Minus_sign.png" alt="Black Minus Sign" height = 200px width = 200px>
-        </button>
-        <button id = "multiplication">
-            <img src="./images/Multiply_sign.png" alt="Black Multiply Sign" height = 200px width = 200px>
-        </button>
-        <button id = "division">
-            <img src="./images/Divide_sign.png" alt="Black Divide Sign" height = 200px width = 200px>
-        </button>
-        <button id = "equals">
-            <img src="./images/Equals_sign.png" alt="Black Equals Sign" height = 200px width = 200px>
-        </button>
-        <button id = "clear">
-            <img src="./images/All_clear.png" alt="All Clear Sign" height="200px" width="200px">
-        </button>
-    </div>
-
-    <div class = 'numbers'>
-        <button id = 'one'>
-            <img src="./images/one_digit.png" alt="One Digit" height="200px" width="200px">
-        </button>
-        <button id = 'two'>
-            <img src="./images/two_digit.jpeg" alt="Two digit" height="200px" width="200px">
-        </button>
-        <button id = 'three'>
-            <img src="./images/three_digit.png" alt="Three digit" height="200px" width="200px">
-        </button>
-        <button id = 'four'>
-            <img src="./images/four_digit.png" alt="Four digit" height="200px" width="200px">
-        </button>
-        <button id = 'five'>
-            <img src="./images/five_digit.png" alt="Five digit" height="200px" width="200px">
-        </button>
-        <button id = 'six'>
-            <img src="./images/six_digit.png" alt="Six digit" height="200px" width="200px">
-        </button>
-        <button id = 'seven'>
-            <img src="./images/seven_digit.jpeg" alt="Seven digit" height="200px" width="200px">
-        </button>
-        <button id = 'eight'>
-            <img src="./images/eight_digit.png" alt="Eight digit" height="200px" width="200px">
-        </button>
-        <button id = 'nine'>
-            <img src="./images/nine_digit.png" alt="Nine digit" height="200px" width="200px">
-        </button>
-        <button id = 'zero'>
-            <img src="./images/zero_digit.jpeg" alt="Zero digit" height="200px" width="200px">
-        </button>
-    </div>
-    <script src = "calculator-file.js"></script>
+    <script src="calculator-file.js"></script>
 </body>
 </html>
